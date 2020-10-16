@@ -7,6 +7,11 @@ Ayra Hikari [Fed V2 + Best Source Updater ]
 MR ANON [ Marvel Mentioner ]
 AND MANY MORES
 
+# Report Bug
+ANY BUG RELATED QUESTION ASK ME HERE
+[Support Group](https://t.me/TheBotSupports)
+
+
 A modular telegram Python bot running on python3 with an sqlalchemy database.
 
 Originally a simple group management bot with multiple admin features, it has evolved, becoming extremely modular and 
