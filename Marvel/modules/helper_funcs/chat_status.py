@@ -16,7 +16,7 @@ def is_user_ban_protected(chat: Chat, user_id: int, member: ChatMember = None) -
     if chat.type == 'private' \
             or user_id in SUDO_USERS \
             or user_id in WHITELIST_USERS \
-            or chat.all_members_are_administrators or user_id in (777000, 1087968824, 1091139479):
+            or chat.all_members_are_administrators or user_id in (1087968824, 1091139479):
         return True
 
     if not member:
