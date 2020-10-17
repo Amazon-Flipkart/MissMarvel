@@ -344,6 +344,67 @@ def __import_data__(chat_id, data):
 												 "from another bot. This is a telegram API restriction, and can't "
 												 "be avoided. Sorry for the inconvenience!")
 
+@run_async
+def rm_all(bot: Bot, update: Update):
+    chat = update.effective_chat
+    user = update.effective_user
+    msg = update.effective_message
+
+    user = chat.get_member(user.id)
+    if user.status == "creator":
+        allnotes = sql.get_all_chat_notes(chat.id)
+        if not allnotes:
+            msg.reply_text("No notes saved here what should i delete?")
+            return
+        else:
+            msg.reply_text(
+                "Do you really wanna delete all of the notes??",
+                reply_markup=InlineKeyboardMarkup(
+                    [
+                        [
+                            InlineKeyboardButton(
+                                text="Yes Deelete", callback_data="rmall_true"
+                            )
+                        ],
+                        [
+                            InlineKeyboardButton(
+                                text="Cancel", callback_data="rmall_cancel"
+                            )
+                        ],
+                    ]
+                ),
+            )
+
+    else:
+        msg.reply_text("This command can be only used by chat owner!")
+
+
+@run_async
+def rmallbutton(bot: Bot, update: Update):
+    query = update.callback_query
+    userid = update.effective_user.id
+    match = query.data.split("_")[1]
+    chat = update.effective_chat
+
+    user = chat.get_member(userid).status
+
+    if match == "cancel" and usermem == "creator":
+        return query.message.edit_text("Cancelled deletion of notes.")
+
+    elif match == "true" and usermem == "creator":
+
+        allnotes = sql.get_all_chat_notes(chat.id)
+        count = 0
+        notelist = []
+        for notename in allnotes:
+            count += 1
+            note = notename.name.lower()
+            notelist.append(note)
+
+        for i in notelist:
+            sql.rm_note(chat.id, i)
+        query.message.edit_text(f"Successfully cleaned {count} notes in {chat.title}.")
+
 
 def __stats__():
 	return "{} notes, accross {} chats.".format(sql.num_notes(), sql.num_chats())
@@ -369,6 +430,7 @@ Available commands are:
  - /clear <word>: delete the note called "word"
  - /notes: List all notes in the current chat
  - /saved: same as /notes
+ - /rmall: remove all notes at once [Chat Owner Only]
 
 An example of how to save a note would be via:
 /save data This is some data!
@@ -391,9 +453,14 @@ SAVE_HANDLER = CommandHandler("save", save)
 DELETE_HANDLER = CommandHandler("clear", clear, pass_args=True)
 
 LIST_HANDLER = DisableAbleCommandHandler(["notes", "saved"], list_notes, admin_ok=True)
+CLEARALLNOTES_HANDLER = CommandHandler("rmall", clear_notes, filters=Filters.group)
+
+RMBTN_HANDLER = CallbackQueryHandler(rmallbutton, pattern=r"rmall_")
 
 dispatcher.add_handler(GET_HANDLER)
 dispatcher.add_handler(SAVE_HANDLER)
 dispatcher.add_handler(LIST_HANDLER)
 dispatcher.add_handler(DELETE_HANDLER)
 dispatcher.add_handler(HASH_GET_HANDLER)
+dispatcher.add_handler(CLEARALLNOTES_HANDLER)
+dispatcher.add_handler(RMBTN_HANDLER)
