@@ -350,8 +350,8 @@ def rm_all(bot: Bot, update: Update):
     user = update.effective_user
     msg = update.effective_message
 
-    user = chat.get_member(user.id)
-    if user.status == "creator":
+    member = chat.get_member(user.id)
+    if meber.status == "creator":
         allnotes = sql.get_all_chat_notes(chat.id)
         if not allnotes:
             msg.reply_text("No notes saved here what should i delete?")
@@ -388,10 +388,10 @@ def rmallbutton(bot: Bot, update: Update):
 
     user = chat.get_member(userid).status
 
-    if match == "cancel" and usermem == "creator":
+    if match == "cancel" and member == "creator":
         return query.message.edit_text("Cancelled deletion of notes.")
 
-    elif match == "true" and usermem == "creator":
+    elif match == "true" and member == "creator":
 
         allnotes = sql.get_all_chat_notes(chat.id)
         count = 0
@@ -453,7 +453,7 @@ SAVE_HANDLER = CommandHandler("save", save)
 DELETE_HANDLER = CommandHandler("clear", clear, pass_args=True)
 
 LIST_HANDLER = DisableAbleCommandHandler(["notes", "saved"], list_notes, admin_ok=True)
-CLEARALLNOTES_HANDLER = CommandHandler("rmall", clear_notes, filters=Filters.group)
+REMOVEALLNOTES_HANDLER = CommandHandler("rmall", rm_all, filters=Filters.group)
 
 RMBTN_HANDLER = CallbackQueryHandler(rmallbutton, pattern=r"rmall_")
 
